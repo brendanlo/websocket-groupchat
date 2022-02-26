@@ -63,8 +63,6 @@ class ChatUser {
   }
 
   /** Handle a joke: broadcast to self.
-   *
-   * @param text {string} message to send
    * */
 
   handleJoke() {
@@ -72,6 +70,23 @@ class ChatUser {
       name: this.name,
       type: "joke",
       text: "this is a great joke. haha",
+    },
+      this);
+  }
+
+
+  /** Handle a joke: broadcast to self.
+   *
+   * @param text {string} message to send
+   * */
+  handleAllUserNames() {
+    let userNames = Array.from(this.room.members);
+    let chatUsers = userNames.map(obj => obj.name);
+  
+    this.room.messageToUser({
+      name: this.name,
+      type: "chatUsers",
+      text: `In room: ${chatUsers.join(", ")}`,
     },
       this);
   }
@@ -92,6 +107,7 @@ class ChatUser {
     if (msg.type === "join") this.handleJoin(msg.name);
     else if (msg.type === "chat") this.handleChat(msg.text);
     else if (msg.type === "joke") this.handleJoke();
+    else if (msg.type === "chatUsers") this.handleAllUserNames();
     else throw new Error(`bad message: ${msg.type}`);
   }
 
