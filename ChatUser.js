@@ -62,7 +62,7 @@ class ChatUser {
     });
   }
 
-  /** Handle a joke: broadcast to self.
+  /** Handle a joke: send to self.
    * */
 
   handleJoke() {
@@ -74,15 +74,39 @@ class ChatUser {
       this);
   }
 
+  /** Handle a private message: send to toUsername from fromUsername.
+   * 
+   * @param 
+   * */
 
-  /** Handle a joke: broadcast to self.
+  handlePrivateMessage(text, toUsername) {
+    const membersArr = Array.from(this.room.members);
+    const toUser = membersArr.find(obj => obj.name === toUsername);
+
+    this.room.messageToUser({
+      name: this.name,
+      type: "privateMessage",
+      text: text,
+    },
+      toUser);
+
+    this.room.messageToUser({
+      name: this.name,
+      type: "privateMessage",
+      text: `to ${toUsername}: ${text}`,
+    },
+      this);
+  }
+
+
+  /** Handle displaying all chatnames in the room: send to self.
    *
    * @param text {string} message to send
    * */
   handleAllUserNames() {
     let userNames = Array.from(this.room.members);
     let chatUsers = userNames.map(obj => obj.name);
-  
+
     this.room.messageToUser({
       name: this.name,
       type: "chatUsers",
@@ -108,6 +132,9 @@ class ChatUser {
     else if (msg.type === "chat") this.handleChat(msg.text);
     else if (msg.type === "joke") this.handleJoke();
     else if (msg.type === "chatUsers") this.handleAllUserNames();
+    else if (msg.type === "privateMessage") {
+      this.handlePrivateMessage(msg.text, msg.toUsername);
+    }
     else throw new Error(`bad message: ${msg.type}`);
   }
 

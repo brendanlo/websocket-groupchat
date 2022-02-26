@@ -28,9 +28,11 @@ ws.onmessage = function (evt) {
   let msg = JSON.parse(evt.data);
   let item;
 
-  if (msg.type === "note" || msg.type === "joke" || msg.type === "chatUsers") {
+  if (msg.type === "note"
+    || msg.type === "joke"
+    || msg.type === "chatUsers") {
     item = $(`<li><i>${msg.text}</i></li>`);
-  } else if (msg.type === "chat") {
+  } else if (msg.type === "chat" || msg.type === "privateMessage") {
     item = $(`<li><b>${msg.name}: </b>${msg.text}</li>`);
   } else {
     return console.error(`bad message: ${msg}`);
@@ -63,9 +65,20 @@ $("form").submit(function (evt) {
 
   if ($("#m").val() === "/joke") {
     data = { type: "joke", text: $("#m").val() };
-  } else if($("#m").val() === "/members") {
+  } else if ($("#m").val() === "/members") {
     data = { type: "chatUsers", text: $("#m").val() };
-  } else {
+  } else if ($("#m").val().includes('/priv')) {
+    const chatValues = $("#m").val().split(" ");
+    const toUser = chatValues[1];
+    const message = chatValues.slice(2).join(" ");
+    data = {
+      type: "privateMessage",
+      text: message,
+      toUsername: toUser,
+      fromUsername: name
+    }
+  }
+  else {
     data = { type: "chat", text: $("#m").val() };
   }
 
